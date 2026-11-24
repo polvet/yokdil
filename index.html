@@ -22,10 +22,28 @@
   --f-mono:ui-monospace,Menlo,Consolas,monospace;
   color-scheme:light;
 }
-@media (prefers-color-scheme: dark){:root{
+@media (prefers-color-scheme: dark){:root:not([data-theme]){
   --paper:#111816; --sheet:#18211e; --ink:#e3ebe7; --muted:#9aaba3; --line:#2b3833;
   --scrub:#6fc7a5; --scrub-soft:#1f3329; --marker:#5a4f12; --marker-ink:#fff3b8;
   --ok:#6fd6a0; --bad:#f08a76; --ok-soft:#183427; --bad-soft:#3a1f1a; color-scheme:dark}}
+:root[data-theme="light"]{color-scheme:light}
+:root[data-theme="dark"]{
+  --paper:#111816; --sheet:#18211e; --ink:#e3ebe7; --muted:#9aaba3; --line:#2b3833;
+  --scrub:#6fc7a5; --scrub-soft:#1f3329; --marker:#5a4f12; --marker-ink:#fff3b8;
+  --ok:#6fd6a0; --bad:#f08a76; --ok-soft:#183427; --bad-soft:#3a1f1a; color-scheme:dark}
+:root[data-theme="book"]{
+  --paper:#efe6d2; --sheet:#f7f0df; --ink:#3a2e1f; --muted:#7a6a55; --line:#ddd0b4;
+  --scrub:#8a5a2b; --scrub-soft:#eadbbd; --marker:#f1dc93; --marker-ink:#3a2e1f;
+  --ok:#4f7a3a; --bad:#a3442e; --ok-soft:#e3e8cf; --bad-soft:#f1d9cf; color-scheme:light}
+:root[data-theme="book"] body{font-family:Georgia,"Times New Roman",serif}
+:root[data-theme="book"] article.sheet{border:0;box-shadow:0 1px 0 var(--line),0 12px 30px rgba(80,55,20,.10);padding:34px clamp(20px,6vw,64px)}
+:root[data-theme="book"] .para p{text-align:justify;hyphens:auto;-webkit-hyphens:auto;text-indent:1.6em;font-size:1.28rem;line-height:1.85;max-width:none}
+:root[data-theme="book"] article h2{text-align:center;font-size:1.8rem;margin:10px 0 4px}
+:root[data-theme="book"] .meta{justify-content:center}
+:root[data-theme="book"] .howto{text-align:center}
+:root[data-theme="book"] .w.tg{background:transparent;color:inherit;border-bottom:2px solid #c99a2e;padding:0}
+:root[data-theme="book"] .w.lrn{text-decoration-color:var(--scrub)}
+.themebtn{font:600 .78rem var(--f-ui);border:1px solid var(--line);background:var(--sheet);color:var(--ink);border-radius:999px;padding:4px 10px;cursor:pointer}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-ui);font-size:16px;line-height:1.5;-webkit-tap-highlight-color:transparent}
@@ -122,7 +140,7 @@ textarea{width:100%;min-height:110px;font:.85rem var(--f-mono);border:1px solid 
 <div class="wrap">
   <header class="top">
     <h1>YÖKDİL <em>Okuma Odası</em></h1>
-    <div class="row"><span class="stat" id="stat"></span><span class="net" id="net"></span></div>
+    <div class="row"><span class="stat" id="stat"></span><span class="net" id="net"></span><button class="themebtn" id="themebtn" aria-label="Temayı değiştir"></button></div>
   </header>
 
   <section id="v-read">
@@ -205,9 +223,9 @@ const DICT=DATA.dict;
 
 /* ---- durum ---- */
 const KEY="yk-app-v1";
-const S={level:1,words:{},readIds:{},scores:{},imported:{},dict:{},lastId:null,tab:"read",wLv:1,wSt:"all"};
+const S={theme:null,level:1,words:{},readIds:{},scores:{},imported:{},dict:{},lastId:null,tab:"read",wLv:1,wSt:"all"};
 try{const d=JSON.parse(localStorage.getItem(KEY)||"null");if(d)Object.assign(S,d,{tab:"read"});}catch(e){}
-function save(){try{localStorage.setItem(KEY,JSON.stringify({level:S.level,words:S.words,readIds:S.readIds,scores:S.scores,imported:S.imported,dict:S.dict,lastId:S.lastId,wLv:S.wLv}));}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify({theme:S.theme,level:S.level,words:S.words,readIds:S.readIds,scores:S.scores,imported:S.imported,dict:S.dict,lastId:S.lastId,wLv:S.wLv}));}catch(e){}}
 let current=null;
 
 /* ---- yardımcılar ---- */
@@ -285,12 +303,12 @@ function openArticle(a,scroll){
   const ts=new Set(targetsOf(a));const L=LEVELS[a.lv-1];
   const h=[];
   h.push(`<article class="sheet" lang="en"><div class="meta"><span class="lv" lang="tr">Seviye ${a.lv} · ${esc(L.name)}</span><span>${esc(a.topic||"")}</span><span>${a.paragraphs.join(" ").split(/\s+/).length} kelime</span>${S.imported[a.id]?"<span>eklenen</span>":""}</div>`);
-  h.push(`<h2>${esc(a.title)}</h2><p class="howto" lang="tr">Sarı kelimeler bu makalenin hedef kelimeleri. Herhangi bir kelimeye dokununca Türkçesi altta çıkar.</p>`);
+  h.push(`<h2>${tokenize(a.title,ts)}</h2><p class="howto" lang="tr">Sarı kelimeler bu makalenin hedef kelimeleri. Herhangi bir kelimeye dokununca Türkçesi altta çıkar.</p>`);
   a.paragraphs.forEach((p,i)=>{h.push(`<div class="para"><p>${tokenize(p,ts)}</p><a class="tr-btn" lang="tr" data-gt="${i}" href="#">Paragrafı Google Çeviri'de aç (internet)</a></div>`);});
   h.push(`<section class="block" lang="tr"><h3>Hedef kelimeler</h3><div class="targets">${[...ts].map(chip).join("")||'<span class="empty">Bu makalede liste kelimesi yok.</span>'}</div></section>`);
   if(a.questions&&a.questions.length){
     h.push(`<section class="block"><h3 lang="tr">YÖKDİL tarzı sorular</h3>`);
-    a.questions.forEach((q,qi)=>{h.push(`<div class="q" id="q-${qi}"><div class="kind">${esc(q.type||"Soru")}</div><p class="qt">${qi+1}. ${esc(q.q)}</p><div class="opts">${q.options.map((o,oi)=>`<button class="opt" data-q="${qi}" data-o="${oi}"><span class="L">${"ABCDE"[oi]||"?"})</span><span>${esc(o)}</span></button>`).join("")}</div><div class="explain" hidden></div></div>`);});
+    a.questions.forEach((q,qi)=>{h.push(`<div class="q" id="q-${qi}"><div class="kind">${esc(q.type||"Soru")}</div><p class="qt">${qi+1}. ${tokenize(q.q,ts)}</p><div class="opts">${q.options.map((o,oi)=>`<button class="opt" data-q="${qi}" data-o="${oi}"><span class="L">${"ABCDE"[oi]||"?"})</span><span>${esc(o)}</span></button>`).join("")}</div><div class="explain" hidden></div></div>`);});
     h.push(`<p class="score" id="score"></p></section>`);
   }
   const read=!!S.readIds[a.id];
@@ -394,6 +412,7 @@ document.addEventListener("click",e=>{
   const sv=e.target.closest("[data-savetr]");if(sv){const v=($("#mytr").value||"").trim();if(v){S.dict[sv.dataset.savetr]=v;save();hidePop();}return;}
   if(e.target.closest("#pop"))return;
   hidePop();
+  if(e.target.id==="themebtn"){cycleTheme();return;}
   const tab=e.target.closest("nav.tabs button");if(tab){switchTab(tab.dataset.tab);return;}
   const lv=e.target.closest("[data-lv]");if(lv){S.level=+lv.dataset.lv;save();const list=levelArticles(S.level);openArticle(list.find(a=>!S.readIds[a.id])||list[0]);return;}
   const gt=e.target.closest("[data-gt]");if(gt){e.preventDefault();if(!navigator.onLine){alert("Çeviri için internet gerekiyor.");return;}window.open("https://translate.google.com/?sl=en&tl=tr&text="+encodeURIComponent(current.paragraphs[+gt.dataset.gt]),"_blank","noopener");return;}
@@ -423,7 +442,15 @@ document.addEventListener("change",e=>{if(e.target.dataset&&e.target.dataset.wse
 document.addEventListener("keydown",e=>{if(e.key==="Escape")hidePop();});
 window.addEventListener("online",renderNet);window.addEventListener("offline",renderNet);
 
+/* ---- tema ---- */
+const THEMES=[["light","☀︎ Açık"],["book","📖 Kitap"],["dark","☾ Koyu"]];
+function applyTheme(){let t=S.theme;if(!t)t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";
+  document.documentElement.setAttribute("data-theme",t);$("#themebtn").textContent=THEMES.find(x=>x[0]===t)[1];
+  const m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t==="dark"?"#111816":t==="book"?"#efe6d2":"#1f5f4a";}
+function cycleTheme(){const cur=document.documentElement.getAttribute("data-theme");const i=THEMES.findIndex(x=>x[0]===cur);S.theme=THEMES[(i+1)%THEMES.length][0];save();applyTheme();}
+
 /* ---- başlat ---- */
+applyTheme();
 renderStat();renderNet();
 openArticle(byId(S.lastId)||levelArticles(S.level).find(a=>!S.readIds[a.id])||DATA.articles[0],false);
 if("serviceWorker" in navigator&&location.protocol!=="file:"){navigator.serviceWorker.register("sw.js").catch(()=>{});}
