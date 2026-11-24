@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>YÖKDİL Okuma Odası</title>
+<meta name="theme-color" content="#1f5f4a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="YÖKDİL">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{
+  --paper:#f6f8f5; --sheet:#ffffff; --ink:#18241f; --muted:#5b6b64; --line:#dbe3de;
+  --scrub:#1f5f4a; --scrub-soft:#e3efe9; --marker:#fff0a3; --marker-ink:#4a3d00;
+  --ok:#1f7a4d; --bad:#b3402e; --ok-soft:#e2f3ea; --bad-soft:#fbe7e3;
+  --f-read:Georgia,"Times New Roman",serif;
+  --f-ui:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --f-mono:ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --paper:#111816; --sheet:#18211e; --ink:#e3ebe7; --muted:#9aaba3; --line:#2b3833;
+  --scrub:#6fc7a5; --scrub-soft:#1f3329; --marker:#5a4f12; --marker-ink:#fff3b8;
+  --ok:#6fd6a0; --bad:#f08a76; --ok-soft:#183427; --bad-soft:#3a1f1a; color-scheme:dark}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-ui);font-size:16px;line-height:1.5;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+.wrap{max-width:780px;margin:0 auto;padding:calc(env(safe-area-inset-top,0px) + 16px) 16px calc(env(safe-area-inset-bottom,0px) + 90px)}
+header.top{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 16px;margin-bottom:12px}
+h1{font-family:var(--f-read);font-weight:600;font-size:1.6rem;margin:0}
+h1 em{font-weight:400;color:var(--scrub)}
+.stat{font-family:var(--f-mono);font-size:.78rem;color:var(--muted)}
+.net{font-size:.72rem;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.net.on{color:var(--ok);border-color:var(--ok)}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;justify-content:center;gap:4px;background:var(--sheet);border-top:1px solid var(--line);padding:6px 8px calc(env(safe-area-inset-bottom,0px) + 6px)}
+nav.tabs button{flex:1;max-width:180px;background:none;border:0;border-radius:10px;padding:10px 6px;font:600 .9rem var(--f-ui);color:var(--muted);cursor:pointer}
+nav.tabs button[aria-selected="true"]{color:var(--scrub);background:var(--scrub-soft)}
+.btn{font:600 .92rem var(--f-ui);border-radius:9px;padding:10px 14px;cursor:pointer;border:1px solid var(--line);background:var(--sheet);color:var(--ink);text-decoration:none;display:inline-block}
+.btn.primary{background:var(--scrub);border-color:var(--scrub);color:var(--sheet)}
+.btn.small{padding:6px 10px;font-size:.82rem}
+.btn:disabled{opacity:.5}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.lvchips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.lvchip{border:1px solid var(--line);background:var(--sheet);color:var(--ink);border-radius:999px;padding:6px 12px;font:600 .85rem var(--f-ui);cursor:pointer}
+.lvchip[aria-pressed="true"]{background:var(--scrub);color:var(--sheet);border-color:var(--scrub)}
+.hint{font-size:.85rem;color:var(--muted);margin:4px 2px 0}
+article.sheet{background:var(--sheet);border:1px solid var(--line);border-radius:14px;padding:22px clamp(16px,4vw,36px);margin-top:14px}
+.meta{display:flex;flex-wrap:wrap;gap:6px 12px;font-family:var(--f-mono);font-size:.74rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.meta .lv{color:var(--scrub)}
+article h2{font-family:var(--f-read);font-weight:600;font-size:1.55rem;line-height:1.2;margin:8px 0 6px}
+.howto{font-size:.84rem;color:var(--muted);margin:0 0 14px}
+.para{margin:0 0 18px}
+.para p{font-family:var(--f-read);font-size:1.2rem;line-height:1.75;margin:0;max-width:65ch}
+.w{cursor:pointer;border-radius:3px}
+.w.on{background:var(--scrub-soft);outline:1px solid var(--scrub)}
+.w.tg{background:var(--marker);color:var(--marker-ink);padding:0 2px}
+.w.lrn{text-decoration:underline dotted var(--scrub);text-underline-offset:4px}
+.tr-btn{background:none;border:0;color:var(--scrub);font:600 .8rem var(--f-ui);cursor:pointer;padding:4px 0;text-decoration:none}
+section.block{margin-top:26px;border-top:1px solid var(--line);padding-top:18px}
+h3{font:700 .74rem var(--f-ui);text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin:0 0 12px}
+.targets{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:4px 6px 4px 11px;font-size:.88rem;background:var(--paper)}
+.chip span.t{color:var(--muted)}
+.chip button{border:0;border-radius:999px;font:600 .72rem var(--f-ui);padding:4px 9px;cursor:pointer;background:var(--line);color:var(--ink)}
+.chip.known{border-color:var(--ok);background:var(--ok-soft)}
+.chip.known button{background:var(--ok);color:var(--sheet)}
+.q{margin-bottom:22px}
+.q .qt{font-weight:500;margin:0 0 8px}
+.q .kind{font-family:var(--f-mono);font-size:.7rem;color:var(--scrub);text-transform:uppercase;letter-spacing:.06em}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{text-align:left;font:inherit;font-size:.95rem;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:9px;padding:9px 11px;cursor:pointer;display:flex;gap:10px}
+.opt .L{font-family:var(--f-mono);color:var(--muted)}
+.opt.right{border-color:var(--ok);background:var(--ok-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.explain{font-size:.9rem;color:var(--muted);margin-top:6px}
+.score{font-weight:600;color:var(--scrub)}
+.done-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:22px}
+#pop{position:fixed;z-index:30;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 70px);max-width:560px;margin:0 auto;background:var(--sheet);border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 32px rgba(0,0,0,.22);padding:14px 16px}
+#pop .pw{font-family:var(--f-read);font-size:1.3rem;font-weight:600}
+#pop .pt{margin:2px 0 8px;font-size:1.05rem}
+#pop .pl{font-family:var(--f-mono);font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+#pop .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+#pop .x{position:absolute;top:6px;right:8px;border:0;background:none;font-size:1.4rem;color:var(--muted);cursor:pointer;padding:4px 8px}
+.levels{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:18px}
+.lvcard{background:var(--sheet);border:1px solid var(--line);border-radius:12px;padding:10px 12px;cursor:pointer;text-align:left;font:inherit;color:var(--ink)}
+.lvcard[aria-pressed="true"]{border-color:var(--scrub);box-shadow:inset 0 0 0 1px var(--scrub)}
+.lvcard .n{font-family:var(--f-mono);font-size:.72rem;color:var(--muted)}
+.lvcard .nm{font-weight:600}
+.meter{height:6px;background:var(--line);border-radius:3px;margin-top:8px;overflow:hidden;display:flex}
+.meter i{display:block;height:100%}
+.meter .k{background:var(--ok)} .meter .l{background:var(--scrub);opacity:.45}
+.wlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px}
+.wrow{display:flex;justify-content:space-between;gap:8px;align-items:center;background:var(--sheet);border:1px solid var(--line);border-radius:9px;padding:6px 8px 6px 10px;font-size:.9rem;min-width:0}
+.wrow div{min-width:0}
+.wrow .t{color:var(--muted);display:block;font-size:.82rem}
+.wrow select{font:inherit;font-size:.78rem;padding:3px 4px;border-radius:6px;border:1px solid var(--line);background:var(--paper);color:var(--ink)}
+.wrow.known{border-color:var(--ok)}
+.filter{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.lvsec{margin-bottom:22px}
+.lvsec h4{font-family:var(--f-read);font-size:1.15rem;margin:0 0 2px}
+.lvsec .sub{font-size:.82rem;color:var(--muted);margin-bottom:8px}
+.alist{display:flex;flex-direction:column;gap:6px}
+.aitem{display:flex;justify-content:space-between;gap:10px;align-items:center;background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;text-align:left;font:inherit;color:var(--ink);width:100%}
+.aitem .tt{font-family:var(--f-read);font-size:1.05rem;font-weight:600}
+.aitem .s2{font-family:var(--f-mono);font-size:.72rem;color:var(--muted)}
+.badge{font:600 .72rem var(--f-ui);color:var(--ok);white-space:nowrap}
+.panel{background:var(--sheet);border:1px solid var(--line);border-radius:14px;padding:16px;margin-top:14px}
+.panel ol{margin:6px 0 10px;padding-left:20px}
+.panel li{margin-bottom:4px}
+textarea{width:100%;min-height:110px;font:.85rem var(--f-mono);border:1px solid var(--line);border-radius:9px;padding:10px;background:var(--paper);color:var(--ink)}
+.msg{font-size:.9rem;margin-top:8px}
+.msg.ok{color:var(--ok)} .msg.err{color:var(--bad)}
+.empty{color:var(--muted);font-size:.9rem;padding:10px 2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>YÖKDİL <em>Okuma Odası</em></h1>
+    <div class="row"><span class="stat" id="stat"></span><span class="net" id="net"></span></div>
+  </header>
+
+  <section id="v-read">
+    <div class="lvchips" id="lvchips"></div>
+    <div class="row">
+      <button class="btn primary" id="nextbtn">Sıradaki makale</button>
+      <button class="btn" id="genbtn">Yeni makale üret</button>
+    </div>
+    <div class="hint" id="lvhint"></div>
+    <div id="article"></div>
+  </section>
+
+  <section id="v-list" hidden>
+    <div id="lvlist"></div>
+  </section>
+
+  <section id="v-words" hidden>
+    <div class="levels" id="levels"></div>
+    <div class="filter" id="wfilter"></div>
+    <div class="wlist" id="wlist"></div>
+  </section>
+
+  <section id="v-gen" hidden>
+    <div class="panel">
+      <h3>Yeni makale üret (internet gerekir)</h3>
+      <ol>
+        <li>Aşağıdaki düğmeyle Claude'daki <b>Okuma Odası</b>'nı aç.</li>
+        <li>Seviyeyi seç, istersen konu yaz, <b>Yeni makale üret</b>'e bas.</li>
+        <li>Makale çıkınca altındaki <b>Uygulamaya aktar</b> düğmesine bas; kod kopyalanır.</li>
+        <li>Buraya dönüp kodu aşağıdaki kutuya yapıştır ve <b>Ekle</b>'ye bas.</li>
+      </ol>
+      <div class="row">
+        <a class="btn primary" id="openclaude" href="https://claude.ai/artifact/8WW22vsyNmSfFspxBXW4Wz" target="_blank" rel="noopener">Okuma Odası'nı aç</a>
+      </div>
+      <p class="hint" id="genoff" hidden>Şu an internet yok. Yeni makale için internete bağlanınca tekrar dene; bu arada hazır makaleleri okuyabilirsin.</p>
+    </div>
+    <div class="panel">
+      <h3>Makale ekle</h3>
+      <textarea id="importbox" placeholder="Kopyaladığın kodu buraya yapıştır (YKD1: ile başlar)"></textarea>
+      <div class="row" style="margin-top:8px">
+        <button class="btn primary" id="importbtn">Ekle</button>
+        <button class="btn" id="pastebtn">Panodan yapıştır</button>
+      </div>
+      <div class="msg" id="importmsg"></div>
+    </div>
+    <div class="panel">
+      <h3>Yedek</h3>
+      <p class="hint" style="margin-top:0">İlerlemen bu iPad'de saklanıyor. Başka cihaza taşımak ya da yedeklemek için kodu kopyala; diğer cihazda "Makale ekle" kutusuna yapıştırman yeterli.</p>
+      <div class="row"><button class="btn" id="backupbtn">Yedek kodunu kopyala</button></div>
+      <textarea id="backupbox" hidden readonly></textarea>
+    </div>
+  </section>
+</div>
+
+<nav class="tabs" role="tablist">
+  <button role="tab" data-tab="read" aria-selected="true">Oku</button>
+  <button role="tab" data-tab="list" aria-selected="false">Makaleler</button>
+  <button role="tab" data-tab="words" aria-selected="false">Kelimeler</button>
+  <button role="tab" data-tab="gen" aria-selected="false">Yeni / Ekle</button>
+</nav>
+<div id="pop" hidden role="dialog" aria-label="Kelime anlamı"></div>
+
+<script src="data.js"></script>
+<script>
+"use strict";
+const DATA=window.YK_DATA;
+const LEVELS=[
+ {n:1,name:"Temel",desc:"Kısa, net cümleler. Temel sağlık kelimeleri."},
+ {n:2,name:"Bağlaçlar",desc:"Bağlaçlar ve sık akademik fiiller; çeviri sorularının anahtarı."},
+ {n:3,name:"Akademik",desc:"Araştırma dili: edilgen yapılar, klinik çalışma kelimeleri."},
+ {n:4,name:"İleri",desc:"Uzun cümleler, YÖKDİL'e yakın fiil ve sıfatlar."},
+ {n:5,name:"Sınav",desc:"Gerçek YÖKDİL okuma parçası yoğunluğu."}
+];
+/* ---- kelime bankası ---- */
+const BANK={},BYLEVEL={1:[],2:[],3:[],4:[],5:[]};
+for(const lv in DATA.bank){for(const pair of DATA.bank[lv].split(";")){const i=pair.indexOf("=");const en=pair.slice(0,i).trim(),tr=pair.slice(i+1).trim();if(!en||BANK[en])continue;BANK[en]={tr,lv:+lv};BYLEVEL[lv].push(en);}}
+const TOTAL=Object.keys(BANK).length;
+const PHRASES=Object.keys(BANK).filter(k=>k.includes(" ")).sort((a,b)=>b.split(" ").length-a.split(" ").length);
+const DICT=DATA.dict;
+
+/* ---- durum ---- */
+const KEY="yk-app-v1";
+const S={level:1,words:{},readIds:{},scores:{},imported:{},dict:{},lastId:null,tab:"read",wLv:1,wSt:"all"};
+try{const d=JSON.parse(localStorage.getItem(KEY)||"null");if(d)Object.assign(S,d,{tab:"read"});}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify({level:S.level,words:S.words,readIds:S.readIds,scores:S.scores,imported:S.imported,dict:S.dict,lastId:S.lastId,wLv:S.wLv}));}catch(e){}}
+let current=null;
+
+/* ---- yardımcılar ---- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const IRREG={led:"lead",found:"find",spread:"spread",underwent:"undergo",undergone:"undergo",arose:"arise",arisen:"arise",bacterium:"bacteria",analyses:"analysis",diagnoses:"diagnosis",children:"child",fell:"fall",fallen:"fall",studies:"study",therapies:"therapy",injuries:"injury",deficiencies:"deficiency",abnormalities:"abnormality",tumours:"tumor",tumour:"tumor",lesions:"lesion",women:"woman",men:"man",mice:"mouse",teeth:"tooth",feet:"foot",lives:"life",was:"be",were:"be",been:"be",is:"be",are:"be",has:"have",had:"have",did:"do",does:"do",made:"make",took:"take",taken:"take",gave:"give",given:"give",began:"begin",begun:"begin",became:"become",grew:"grow",grown:"grow",known:"know",knew:"know",shown:"show",seen:"see",saw:"see",held:"hold",kept:"keep",lost:"lose",left:"leave",brought:"bring",thought:"think",sought:"seek",ate:"eat",eaten:"eat",slept:"sleep",fought:"fight",bound:"bind",broken:"break",broke:"break",chose:"choose",chosen:"choose",driven:"drive",drunk:"drink",drank:"drink",worse:"bad",worst:"bad",better:"good",best:"good"};
+function cands(w){
+  w=w.toLowerCase().replace(/’/g,"'").replace(/^['-]+|['-]+$/g,"").replace(/'s$/,"");
+  const c=[w]; if(IRREG[w])c.push(IRREG[w]);
+  const add=x=>{if(x&&x.length>1&&!c.includes(x))c.push(x)};
+  if(w.endsWith("ies"))add(w.slice(0,-3)+"y");
+  if(w.endsWith("es"))add(w.slice(0,-2));
+  if(w.endsWith("s"))add(w.slice(0,-1));
+  if(w.endsWith("ied"))add(w.slice(0,-3)+"y");
+  if(w.endsWith("ed")){add(w.slice(0,-2));add(w.slice(0,-1));const b=w.slice(0,-2);if(/(.)\1$/.test(b))add(b.slice(0,-1));}
+  if(w.endsWith("ing")){const b=w.slice(0,-3);add(b);add(b+"e");if(/(.)\1$/.test(b))add(b.slice(0,-1));}
+  if(w.endsWith("ily"))add(w.slice(0,-3)+"y");
+  if(w.endsWith("ly"))add(w.slice(0,-2));
+  if(w.endsWith("er"))add(w.slice(0,-2));
+  if(w.endsWith("est"))add(w.slice(0,-3));
+  return c;
+}
+function bankKey(w){for(const c of cands(w))if(BANK[c])return c;return null;}
+function lookup(word,art){
+  const k=bankKey(word); if(k)return {key:k,tr:BANK[k].tr,src:"bank",lv:BANK[k].lv};
+  const cs=cands(word);
+  const g=(art&&art.glossary)||{};const gl={};for(const x in g)gl[x.toLowerCase()]=g[x];
+  for(const c of cs)if(gl[c])return {key:c,tr:gl[c],src:"Makale sözlüğü"};
+  for(const c of cs)if(DICT[c])return {key:c,tr:DICT[c],src:"Sözlük"};
+  for(const c of cs)if(S.dict[c])return {key:c,tr:S.dict[c],src:"Senin sözlüğün"};
+  return null;
+}
+const status=k=>S.words[k]||"new";
+function setStatus(k,st){if(!BANK[k])return;if(st==="new")delete S.words[k];else S.words[k]=st;save();renderStat();}
+
+/* ---- makaleler ---- */
+function allArticles(){return [...DATA.articles,...Object.values(S.imported).sort((a,b)=>(a.created||0)-(b.created||0))];}
+function byId(id){return DATA.articles.find(a=>a.id===id)||S.imported[id]||null;}
+function levelArticles(lv){return allArticles().filter(a=>a.lv===lv);}
+function targetsOf(a){
+  if(a.targets&&a.targets.length)return a.targets.filter(k=>BANK[k]);
+  if(a._t)return a._t;
+  const text=a.paragraphs.join(" ").toLowerCase();const found=[];
+  const toks=new Set((text.match(/[a-z][a-z'-]*/g)||[]).map(t=>bankKey(t)).filter(Boolean));
+  for(const ph of PHRASES)if(text.includes(ph))toks.add(ph);
+  const same=[...toks].filter(k=>BANK[k].lv===a.lv), lower=[...toks].filter(k=>BANK[k].lv<a.lv).sort((x,y)=>BANK[y].lv-BANK[x].lv);
+  a._t=same.concat(lower).slice(0,15);return a._t;
+}
+function tokenize(text,ts){
+  const parts=text.match(/[A-Za-z][A-Za-z'’-]*|[^A-Za-z]+/g)||[];
+  let out="",i=0;
+  while(i<parts.length){
+    const p=parts[i];
+    if(!/^[A-Za-z]/.test(p)){out+=esc(p);i++;continue;}
+    let matched=false;
+    for(const ph of PHRASES){
+      const n=ph.split(" ").length;const ws=[];let j=i,raw="";
+      while(ws.length<n&&j<parts.length){const t=parts[j];if(/^[A-Za-z]/.test(t))ws.push(t);else if(!/^\s+$/.test(t))break;raw+=t;j++;}
+      if(ws.length<n)continue;
+      const rest=ws.slice(1).map(x=>x.toLowerCase()).join(" ");
+      const head=ws.slice(0,-1).map(x=>x.toLowerCase()).join(" ");
+      const ok=cands(ws[0]).some(f=>(f+" "+rest)===ph)||cands(ws[n-1]).some(l=>(head+" "+l)===ph);
+      if(ok){const cls=["w"];if(ts.has(ph))cls.push("tg");else if(status(ph)==="learning")cls.push("lrn");
+        out+=`<span class="${cls.join(" ")}" data-k="${esc(ph)}">${esc(raw)}</span>`;i=j;matched=true;break;}
+    }
+    if(matched)continue;
+    const k=bankKey(p);const cls=["w"];
+    if(k&&ts.has(k))cls.push("tg");else if(k&&status(k)==="learning")cls.push("lrn");
+    out+=`<span class="${cls.join(" ")}" data-w="${esc(p)}"${k?` data-k="${esc(k)}"`:""}>${esc(p)}</span>`;i++;
+  }
+  return out;
+}
+function openArticle(a,scroll){
+  current=a;S.lastId=a.id;S.level=a.lv;save();hidePop();
+  const ts=new Set(targetsOf(a));const L=LEVELS[a.lv-1];
+  const h=[];
+  h.push(`<article class="sheet" lang="en"><div class="meta"><span class="lv" lang="tr">Seviye ${a.lv} · ${esc(L.name)}</span><span>${esc(a.topic||"")}</span><span>${a.paragraphs.join(" ").split(/\s+/).length} kelime</span>${S.imported[a.id]?"<span>eklenen</span>":""}</div>`);
+  h.push(`<h2>${esc(a.title)}</h2><p class="howto" lang="tr">Sarı kelimeler bu makalenin hedef kelimeleri. Herhangi bir kelimeye dokununca Türkçesi altta çıkar.</p>`);
+  a.paragraphs.forEach((p,i)=>{h.push(`<div class="para"><p>${tokenize(p,ts)}</p><a class="tr-btn" lang="tr" data-gt="${i}" href="#">Paragrafı Google Çeviri'de aç (internet)</a></div>`);});
+  h.push(`<section class="block" lang="tr"><h3>Hedef kelimeler</h3><div class="targets">${[...ts].map(chip).join("")||'<span class="empty">Bu makalede liste kelimesi yok.</span>'}</div></section>`);
+  if(a.questions&&a.questions.length){
+    h.push(`<section class="block"><h3 lang="tr">YÖKDİL tarzı sorular</h3>`);
+    a.questions.forEach((q,qi)=>{h.push(`<div class="q" id="q-${qi}"><div class="kind">${esc(q.type||"Soru")}</div><p class="qt">${qi+1}. ${esc(q.q)}</p><div class="opts">${q.options.map((o,oi)=>`<button class="opt" data-q="${qi}" data-o="${oi}"><span class="L">${"ABCDE"[oi]||"?"})</span><span>${esc(o)}</span></button>`).join("")}</div><div class="explain" hidden></div></div>`);});
+    h.push(`<p class="score" id="score"></p></section>`);
+  }
+  const read=!!S.readIds[a.id];
+  h.push(`<div class="done-row" lang="tr"><button class="btn primary" id="markread">${read?"Okundu ✓":"Okudum, kelimeleri listeme al"}</button><button class="btn" id="next2">Sıradaki makale</button></div></article>`);
+  $("#article").innerHTML=h.join("");
+  answered={};
+  renderChips();renderHint();
+  if(S.tab!=="read")switchTab("read");
+  if(scroll!==false)window.scrollTo(0,0);
+}
+let answered={};
+function chip(k){const st=status(k);return `<span class="chip ${st==="known"?"known":""}" data-chip="${esc(k)}"><b>${esc(k)}</b><span class="t">${esc(BANK[k].tr)}</span><button data-know="${esc(k)}">${st==="known"?"Biliyorum ✓":"Biliyorum"}</button></span>`;}
+function refreshChips(){document.querySelectorAll("[data-chip]").forEach(el=>{el.outerHTML=chip(el.dataset.chip);});}
+function refreshMarks(){document.querySelectorAll(".w[data-k]").forEach(el=>{if(!el.classList.contains("tg"))el.classList.toggle("lrn",status(el.dataset.k)==="learning");});}
+function nextArticle(){
+  const list=levelArticles(S.level);
+  const unread=list.filter(a=>!S.readIds[a.id]&&(!current||a.id!==current.id));
+  if(unread.length){openArticle(unread[0]);return;}
+  const idx=current?list.findIndex(a=>a.id===current.id):-1;
+  if(S.level<5&&list.every(a=>S.readIds[a.id])){
+    if(confirm(`Seviye ${S.level}'deki tüm makaleleri okudun. Seviye ${S.level+1}'e geçelim mi?`)){S.level++;save();const n=levelArticles(S.level).find(a=>!S.readIds[a.id])||levelArticles(S.level)[0];openArticle(n);return;}
+  }
+  openArticle(list[(idx+1)%list.length]);
+}
+
+/* ---- kelime kutusu ---- */
+const pop=$("#pop");let popEl=null;
+function hidePop(){pop.hidden=true;if(popEl)popEl.classList.remove("on");popEl=null;}
+function showPop(el){
+  if(popEl)popEl.classList.remove("on");popEl=el;el.classList.add("on");
+  const word=el.dataset.k||el.dataset.w;
+  const res=el.dataset.k&&BANK[el.dataset.k]?{key:el.dataset.k,tr:BANK[el.dataset.k].tr,src:"bank",lv:BANK[el.dataset.k].lv}:lookup(word,current);
+  const shown=res&&res.src==="bank"?res.key:word;
+  let h=`<button class="x" aria-label="Kapat" data-close>×</button><div class="pw">${esc(shown)}</div>`;
+  if(res){h+=`<div class="pt">${esc(res.tr)}</div>`;
+    if(res.src==="bank"){const st=status(res.key);h+=`<div class="pl">YÖKDİL listesi · Seviye ${res.lv} · ${st==="known"?"biliyorsun":st==="learning"?"öğreniyorsun":"yeni"}</div><div class="acts"><button class="btn small" data-set="learning" data-key="${esc(res.key)}">Öğreniyorum</button><button class="btn small" data-set="known" data-key="${esc(res.key)}">Biliyorum</button></div>`;}
+    else h+=`<div class="pl">${esc(res.src)}</div>`;
+  }else{h+=`<div class="pt">Bu kelime çevrimdışı sözlükte yok.</div><div class="row"><input id="mytr" placeholder="Anlamını yaz, kaydet" style="flex:1;min-width:140px;font:inherit;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink)"><button class="btn small" data-savetr="${esc(word.toLowerCase())}">Kaydet</button></div>`;}
+  const q=encodeURIComponent(shown.toLowerCase());
+  if(navigator.onLine)h+=`<div class="acts"><a class="btn small" target="_blank" rel="noopener" href="https://tureng.com/tr/turkce-ingilizce/${q}">Tureng</a><a class="btn small" target="_blank" rel="noopener" href="https://translate.google.com/?sl=en&tl=tr&text=${q}">Google Çeviri</a></div>`;
+  pop.innerHTML=h;pop.hidden=false;
+  if(res&&res.src==="bank"&&status(res.key)==="new")setStatus(res.key,"learning");
+}
+
+/* ---- görünümler ---- */
+function counts(lv){const ks=lv?BYLEVEL[lv]:Object.keys(BANK);let k=0,l=0;for(const x of ks){if(S.words[x]==="known")k++;else if(S.words[x]==="learning")l++;}return {k,l,t:ks.length};}
+function renderStat(){const c=counts();const r=Object.keys(S.readIds).length;$("#stat").textContent=`${r} makale okundu · ${c.k}/${c.t} kelime biliyorsun`;}
+function renderNet(){const on=navigator.onLine;const n=$("#net");n.textContent=on?"çevrimiçi":"çevrimdışı";n.className="net"+(on?" on":"");$("#genoff").hidden=on;}
+function renderChips(){$("#lvchips").innerHTML=LEVELS.map(L=>{const list=levelArticles(L.n);const r=list.filter(a=>S.readIds[a.id]).length;return `<button class="lvchip" data-lv="${L.n}" aria-pressed="${S.level===L.n}">${L.n} · ${L.name} <span style="opacity:.75">${r}/${list.length}</span></button>`;}).join("");}
+function renderHint(){const L=LEVELS[S.level-1];const list=levelArticles(S.level);const r=list.filter(a=>S.readIds[a.id]).length;const c=counts(S.level);
+  let t=`${L.desc} Bu seviyede ${list.length} makalenin ${r} tanesini okudun.`;
+  if(S.level<5&&(r>=Math.min(8,list.length)||c.k/c.t>=0.7))t+=` Bir üst seviyeye geçmeye hazırsın.`;
+  $("#lvhint").textContent=t;}
+function renderList(){
+  $("#lvlist").innerHTML=LEVELS.map(L=>{const list=levelArticles(L.n);const r=list.filter(a=>S.readIds[a.id]).length;
+    return `<div class="lvsec"><h4>Seviye ${L.n} · ${L.name}</h4><div class="sub">${r}/${list.length} okundu</div><div class="alist">${list.map(a=>{const sc=S.scores[a.id];return `<button class="aitem" data-open="${esc(a.id)}"><div><div class="tt">${esc(a.title)}</div><div class="s2">${esc(a.topic||"")}${S.imported[a.id]?" · eklenen":""}</div></div><span class="badge">${S.readIds[a.id]?"Okundu ✓":""}${sc?` ${sc.c}/${sc.t}`:""}</span></button>`;}).join("")}</div></div>`;}).join("");
+}
+function renderWords(){
+  $("#levels").innerHTML=LEVELS.map(L=>{const c=counts(L.n);return `<button class="lvcard" data-lvcard="${L.n}" aria-pressed="${S.wLv===L.n}"><div class="n">Seviye ${L.n}</div><div class="nm">${L.name}</div><div class="n">${c.k}/${c.t} biliyor · ${c.l} öğreniyor</div><div class="meter"><i class="k" style="width:${c.k/c.t*100}%"></i><i class="l" style="width:${c.l/c.t*100}%"></i></div></button>`;}).join("");
+  const f=[["all","Hepsi"],["new","Yeni"],["learning","Öğreniyorum"],["known","Biliyorum"]];
+  $("#wfilter").innerHTML=f.map(([v,t])=>`<button class="btn small${S.wSt===v?" primary":""}" data-wst="${v}">${t}</button>`).join("");
+  const ks=BYLEVEL[S.wLv].filter(k=>S.wSt==="all"||status(k)===S.wSt);
+  $("#wlist").innerHTML=ks.length?ks.map(k=>{const st=status(k);return `<div class="wrow ${st==="known"?"known":""}"><div><b>${esc(k)}</b><span class="t">${esc(BANK[k].tr)}</span></div><select data-wsel="${esc(k)}" aria-label="${esc(k)} durumu"><option value="new"${st==="new"?" selected":""}>Yeni</option><option value="learning"${st==="learning"?" selected":""}>Öğreniyorum</option><option value="known"${st==="known"?" selected":""}>Biliyorum</option></select></div>`;}).join(""):`<div class="empty">Bu filtrede kelime yok.</div>`;
+}
+function switchTab(t){S.tab=t;for(const b of document.querySelectorAll("nav.tabs button"))b.setAttribute("aria-selected",b.dataset.tab===t);
+  for(const v of ["read","list","words","gen"])$("#v-"+v).hidden=v!==t;hidePop();
+  if(t==="list")renderList();if(t==="words")renderWords();if(t==="read"){renderChips();renderHint();}
+  window.scrollTo(0,0);}
+
+/* ---- içe/dışa aktarma ---- */
+function b64dec(s){const bin=atob(s.replace(/\s+/g,""));const bytes=Uint8Array.from(bin,c=>c.charCodeAt(0));return new TextDecoder().decode(bytes);}
+function b64enc(str){const bytes=new TextEncoder().encode(str);let bin="";for(let i=0;i<bytes.length;i+=8192)bin+=String.fromCharCode.apply(null,bytes.subarray(i,i+8192));return btoa(bin);}
+function cleanArticle(x){
+  if(!x||!Array.isArray(x.paragraphs)||!x.paragraphs.length)return null;
+  const lv=Math.min(5,Math.max(1,parseInt(x.lv)||1));
+  const qs=(Array.isArray(x.questions)?x.questions:[]).filter(q=>q&&Array.isArray(q.options)&&q.options.length>=2).map(q=>({type:String(q.type||"Soru"),q:String(q.q||""),options:q.options.map(String),answer:Math.max(0,Math.min(q.options.length-1,parseInt(q.answer)||0)),explain:String(q.explain||"")}));
+  const gl={};if(x.glossary&&typeof x.glossary==="object")for(const k in x.glossary)gl[String(k).toLowerCase()]=String(x.glossary[k]);
+  return {id:"i_"+String(x.id||Date.now()).replace(/[^\w-]/g,""),lv,title:String(x.title||"Başlıksız"),topic:String(x.topic||""),targets:Array.isArray(x.targets)?x.targets.map(String):[],paragraphs:x.paragraphs.map(String),glossary:gl,questions:qs,created:Number(x.created)||Date.now()};
+}
+function importText(txt){
+  txt=txt.trim();if(!txt)throw new Error("Kutu boş.");
+  let obj;
+  const m=txt.match(/YKD1:([A-Za-z0-9+/=\s]+)/);const b=txt.match(/YKB1:([A-Za-z0-9+/=\s]+)/);
+  if(b){obj=JSON.parse(b64dec(b[1]));if(obj&&obj.kind==="backup"){const d=obj.state||{};
+      for(const k in d.words||{})if(!S.words[k]||d.words[k]==="known")S.words[k]=d.words[k];
+      Object.assign(S.readIds,d.readIds||{});Object.assign(S.scores,d.scores||{});Object.assign(S.imported,d.imported||{});Object.assign(S.dict,d.dict||{});
+      save();return "Yedek geri yüklendi.";}}
+  if(m)obj=JSON.parse(b64dec(m[1]));else obj=JSON.parse(txt);
+  const arr=Array.isArray(obj)?obj:(obj&&Array.isArray(obj.articles)?obj.articles:[obj]);
+  let n=0,first=null;
+  for(const x of arr){const a=cleanArticle(x);if(!a)continue;S.imported[a.id]=a;n++;if(!first)first=a;}
+  if(!n)throw new Error("Kodda makale bulunamadı.");
+  save();return {n,first};
+}
+
+/* ---- olaylar ---- */
+document.addEventListener("click",e=>{
+  const w=e.target.closest(".w");if(w){showPop(w);return;}
+  if(e.target.closest("[data-close]")){hidePop();return;}
+  const st=e.target.closest("[data-set]");if(st){setStatus(st.dataset.key,st.dataset.set);hidePop();refreshMarks();refreshChips();return;}
+  const sv=e.target.closest("[data-savetr]");if(sv){const v=($("#mytr").value||"").trim();if(v){S.dict[sv.dataset.savetr]=v;save();hidePop();}return;}
+  if(e.target.closest("#pop"))return;
+  hidePop();
+  const tab=e.target.closest("nav.tabs button");if(tab){switchTab(tab.dataset.tab);return;}
+  const lv=e.target.closest("[data-lv]");if(lv){S.level=+lv.dataset.lv;save();const list=levelArticles(S.level);openArticle(list.find(a=>!S.readIds[a.id])||list[0]);return;}
+  const gt=e.target.closest("[data-gt]");if(gt){e.preventDefault();if(!navigator.onLine){alert("Çeviri için internet gerekiyor.");return;}window.open("https://translate.google.com/?sl=en&tl=tr&text="+encodeURIComponent(current.paragraphs[+gt.dataset.gt]),"_blank","noopener");return;}
+  const kn=e.target.closest("[data-know]");if(kn){const k=kn.dataset.know;setStatus(k,status(k)==="known"?"learning":"known");refreshChips();refreshMarks();renderHint();return;}
+  const op=e.target.closest(".opt");if(op&&!op.disabled){const qi=+op.dataset.q,oi=+op.dataset.o;const q=current.questions[qi];const box=document.getElementById("q-"+qi);
+    box.querySelectorAll(".opt").forEach((b,bi)=>{b.disabled=true;if(bi===q.answer)b.classList.add("right");else if(bi===oi)b.classList.add("wrong");});
+    const ex=box.querySelector(".explain");ex.hidden=false;ex.textContent=(oi===q.answer?"Doğru. ":"Yanlış; doğru cevap "+"ABCDE"[q.answer]+". ")+(q.explain||"");
+    answered[qi]=oi===q.answer;const n=Object.keys(answered).length;const c=Object.values(answered).filter(Boolean).length;
+    if(n===current.questions.length){S.scores[current.id]={c,t:n};save();$("#score").textContent=`Sonuç: ${n} sorudan ${c} doğru.`;}
+    return;}
+  if(e.target.id==="markread"&&current){S.readIds[current.id]=Date.now();for(const k of targetsOf(current))if(status(k)==="new")S.words[k]="learning";save();e.target.textContent="Okundu ✓";renderStat();renderChips();renderHint();refreshMarks();return;}
+  if(e.target.id==="nextbtn"||e.target.id==="next2"){nextArticle();return;}
+  if(e.target.id==="genbtn"){switchTab("gen");return;}
+  const lc=e.target.closest("[data-lvcard]");if(lc){S.wLv=+lc.dataset.lvcard;save();renderWords();return;}
+  const ws=e.target.closest("[data-wst]");if(ws){S.wSt=ws.dataset.wst;renderWords();return;}
+  const oa=e.target.closest("[data-open]");if(oa){const a=byId(oa.dataset.open);if(a)openArticle(a);return;}
+  if(e.target.id==="importbtn"){const msg=$("#importmsg");try{const r=importText($("#importbox").value);
+      if(typeof r==="string"){msg.className="msg ok";msg.textContent=r;renderStat();}
+      else{msg.className="msg ok";msg.textContent=`${r.n} makale eklendi. Açılıyor…`;$("#importbox").value="";setTimeout(()=>openArticle(r.first),600);}
+    }catch(err){msg.className="msg err";msg.textContent="Kod okunamadı: "+(err.message||"geçersiz kod")+" Kodu eksiksiz kopyaladığından emin ol.";}return;}
+  if(e.target.id==="pastebtn"){if(navigator.clipboard&&navigator.clipboard.readText){navigator.clipboard.readText().then(t=>{$("#importbox").value=t;}).catch(()=>{$("#importmsg").className="msg err";$("#importmsg").textContent="Panoya erişilemedi; kutuya basılı tutup Yapıştır de.";});}return;}
+  if(e.target.id==="backupbtn"){const code="YKB1:"+b64enc(JSON.stringify({kind:"backup",state:{words:S.words,readIds:S.readIds,scores:S.scores,imported:S.imported,dict:S.dict}}));
+    const box=$("#backupbox");box.hidden=false;box.value=code;box.select();
+    (navigator.clipboard?navigator.clipboard.writeText(code):Promise.reject()).then(()=>{e.target.textContent="Kopyalandı ✓";}).catch(()=>{e.target.textContent="Kutudaki kodu kopyala";});return;}
+});
+document.addEventListener("change",e=>{if(e.target.dataset&&e.target.dataset.wsel){setStatus(e.target.dataset.wsel,e.target.value);renderWords();}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")hidePop();});
+window.addEventListener("online",renderNet);window.addEventListener("offline",renderNet);
+
+/* ---- başlat ---- */
+renderStat();renderNet();
+openArticle(byId(S.lastId)||levelArticles(S.level).find(a=>!S.readIds[a.id])||DATA.articles[0],false);
+if("serviceWorker" in navigator&&location.protocol!=="file:"){navigator.serviceWorker.register("sw.js").catch(()=>{});}
+</script>
+</body>
+</html>

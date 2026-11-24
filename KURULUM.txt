@@ -1,0 +1,26 @@
+YÖKDİL OKUMA ODASI – iPad KURULUMU
+=================================
+
+A) GitHub'a yükle (bir kez, bilgisayardan daha kolay)
+1. github.com'a gir, sağ üstte "+" > "New repository".
+2. Ad: yokdil  ·  "Public" seç  ·  "Create repository".
+3. Açılan sayfada "uploading an existing file" bağlantısına tıkla.
+4. Bu klasördeki dosyaların hepsini (index.html, data.js, sw.js,
+   manifest.webmanifest, icon-192.png, icon-512.png, apple-touch-icon.png)
+   sürükleyip bırak > "Commit changes".
+5. Depoda "Settings" > soldan "Pages" > Branch: "main", klasör "/ (root)" > "Save".
+6. 1-2 dakika sonra adresin hazır olur:
+   https://KULLANICI-ADIN.github.io/yokdil/
+
+B) iPad'e yükle
+1. iPad'de Safari ile yukarıdaki adresi aç (internet açıkken).
+2. Paylaş düğmesi (kare + yukarı ok) > "Ana Ekrana Ekle" > "Ekle".
+3. Ana ekrandaki "YÖKDİL" simgesiyle aç. Bir kez açtıktan sonra internetsiz çalışır.
+
+C) Yeni makale eklemek (internet gerekir)
+1. Uygulamada "Yeni / Ekle" sekmesi > "Okuma Odası'nı aç".
+2. Claude'daki sayfada makale üret > altta "Uygulamaya aktar" (kod kopyalanır).
+3. Uygulamaya dön > kutuya yapıştır > "Ekle".
+
+Not: Uygulamayı güncellemek istersen dosyaları GitHub'da değiştirip
+sw.js içindeki "yokdil-v1" adını "yokdil-v2" yapman yeterli.
